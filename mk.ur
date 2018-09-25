@@ -13,7 +13,12 @@ datatype mkTree =
        | Link of string * url
        | Hr
 	   
-
+(* TODO this would be fancier if there was a typeclass showMk *)
+(* TODO tables *)
+(* TODO embed posts / boards / etc *)
+(* TODO parse raw text *)
+(* TODO editor *)
+	 
 fun renderMk markdown =
     case markdown of
 	H1 title => <xml><h1>{[title]}</h1></xml>
