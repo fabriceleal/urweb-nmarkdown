@@ -1,0 +1,5 @@
+allow url /Mk/otherPage
+file /mk.css mk.css
+
+$/list
+mk
