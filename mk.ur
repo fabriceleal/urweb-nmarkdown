@@ -6,8 +6,8 @@ datatype mkTree =
        | H3 of string
        | Paragraph of list mkTree
        | Frag of string
-       | Bold of string
-       | Italic of string
+       | Bold of list mkTree
+       | Italic of list mkTree
        | Parts of list mkTree
        | Bullets of list mkTree
        | Numbered of list mkTree
@@ -16,13 +16,12 @@ datatype mkTree =
        | Br
        | Blank
 
-
 	 
 (* TODO this would be fancier if there was a typeclass showMk *)
 (* TODO tables *)
 (* TODO embed posts / boards / etc *)
-(* TODO parse raw text *)
-(* TODO editor *)
+(* INPROG parse raw text *)
+(* INPROG editor *)
 (* TODO find a way of serialize / deserialize the parsed structure from db. urls, specially *)
 	 
 fun renderMk markdown =
@@ -34,8 +33,8 @@ fun renderMk markdown =
 	<xml>
 	  <div> { List.foldr (fn e acc => <xml>{renderMk e} {acc}</xml>) <xml></xml> ls }</div></xml>
       | Frag text => <xml>{[text]}</xml>
-      | Bold text => <xml><strong>{[text]}</strong></xml>
-      | Italic text => <xml><em>{[text]}</em></xml>
+      | Bold ls => <xml><strong>{ List.foldr (fn e acc => <xml>{renderMk e} {acc}</xml>) <xml></xml> ls }</strong></xml>
+      | Italic ls => <xml><em>{ List.foldr (fn e acc => <xml>{renderMk e} {acc}</xml>) <xml></xml> ls }</em></xml>
       | Hr => <xml><hr /></xml>
       | Br => <xml><br /></xml>
       | Blank => <xml></xml>
@@ -71,8 +70,8 @@ fun otherPage () =
     </xml>
 
 val testMk = Parts ((H1 "title") ::
-				 (Paragraph ((Frag "this is some text") :: (Bold "test bold") :: (Frag "bla bla ") ::
-									(Italic "test italic") :: (Frag "bla bla bla ") ::
+				 (Paragraph ((Frag "this is some text") :: (Bold ((Frag "test bold") :: [])) :: (Frag "bla bla ") ::
+									(Italic ((Frag "test italic") :: [])) :: (Frag "bla bla bla ") ::
 									[]))
 				 ::
 				 (H2 "title2")
@@ -126,6 +125,7 @@ fun compileAsStringL (t: list mkGroup) : string =
 
 fun compileAsMkTreeL (e : list mkGroup) : list mkTree =
     let
+	(* group italic / bold formatting. is there a more general way of doing this? *)
 	fun eatItalic ls acc =
 	    case ls of
 		[] =>
@@ -134,7 +134,7 @@ fun compileAsMkTreeL (e : list mkGroup) : list mkTree =
 		case h of
 		    (raw, tag) =>
 		    case tag of
-			ItalicDel => Italic (compileAsStringL (List.rev acc)) :: (compileAsMkTreeL t)
+			ItalicDel => Italic (compileAsMkTreeL (List.rev acc)) :: (compileAsMkTreeL t)
 		      | _ => eatItalic t (h :: acc)
 	
 	and eatBold ls acc =
@@ -145,7 +145,7 @@ fun compileAsMkTreeL (e : list mkGroup) : list mkTree =
 		case h of
 		    (raw, tag) =>
 		    case tag of
-			BoldDel => Bold (compileAsStringL (List.rev acc)) :: (compileAsMkTreeL t)
+			BoldDel => Bold (compileAsMkTreeL (List.rev acc)) :: (compileAsMkTreeL t)
 		      | _ => eatBold t (h :: acc)
     in
 	case e of
