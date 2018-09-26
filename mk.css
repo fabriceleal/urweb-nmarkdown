@@ -12,3 +12,23 @@ ol li:before {
   counter-increment: item
 }
 */
+
+
+.left {
+    float: left;
+    width: 50%;
+    height: 90vh;
+}
+
+.right {
+    float: right;
+    width: 50%;
+    height: 100vh;
+}
+
+.fit {
+    box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    height: 100%;
+    width: 100%;
+}
