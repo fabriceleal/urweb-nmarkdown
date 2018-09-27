@@ -85,7 +85,7 @@ val testMk = Parts ((H1 "title") ::
 				 (Numbered ((Frag "item 1") :: (Frag "item 2") ::
 							    (Numbered ((Frag "item 3.1") :: (Frag "item 3.2") :: [])) :: []))
 				 ::
-				 (Link ("link from blessed", (bless "/Mk/otherPage")))
+				 (Link ("link from blessed", (bless "/Nmarkdown/otherPage")))
 				 ::
 				 (Link ("link from urled", (url (otherPage ()))))
 				 ::
@@ -96,7 +96,7 @@ val testMk = Parts ((H1 "title") ::
 fun test () =
     return <xml>
       <head>
-	<link rel="stylesheet" type="text/css" href="/mk.css"/>
+	<link rel="stylesheet" type="text/css" href="/nmarkdown.css"/>
       </head>
       <body>
 	{ renderMk testMk }
@@ -224,7 +224,7 @@ fun test2 () =
     
     return <xml>
       <head>
-	<link rel="stylesheet" type="text/css" href="/mk.css"/>
+	<link rel="stylesheet" type="text/css" href="/nmarkdown.css"/>
       </head>
       <body>
 	<div class="left">

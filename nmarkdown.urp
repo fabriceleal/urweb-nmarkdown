@@ -1,0 +1,10 @@
+allow url /Nmarkdown/otherPage
+file /nmarkdown.css nmarkdown.css
+rewrite style Nmarkdown/left left
+rewrite style Nmarkdown/right right
+rewrite style Nmarkdown/fit fit
+library ../urweb-nregex/nregex
+
+$/option
+$/list
+nmarkdown
