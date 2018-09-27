@@ -52,8 +52,8 @@ fun renderMk markdown =
 	</xml>
       | Parts p =>
 	List.foldr (fn e acc => <xml>{renderMk e} {acc}</xml>) <xml></xml> p
-      | Link (text, target) =>
-	<xml><a href={target}>{[text]}</a></xml>
+      | Link (text, tgLink) =>
+	<xml><a href={tgLink}>{[text]}</a></xml>
 
 fun testPageWithPars blah =
     return <xml>
@@ -108,6 +108,7 @@ style right
 style fit
 
 type mkGroup = string * mkTag
+type mkUrlGroup = string * mkLinkPart
       
 fun renderMk' s =
     v <- signal s;
@@ -123,6 +124,26 @@ fun compileAsString (e : mkGroup) : string =
 fun compileAsStringL (t: list mkGroup) : string =
     List.foldr strcat "" (List.mp compileAsString t)
 
+fun lookup [t ::: Type] (_ : eq t) (ls : list (string * t)) (p : t) : option string =
+    case ls of
+	[] => None
+      | h :: rest =>
+	case h of
+	    (raw, tag) =>
+	    if tag = p then
+		Some raw
+	    else
+		lookup rest p
+
+fun compilePartsOfLink (parts: list mkUrlGroup) : option mkTree =
+    txt <- lookup parts UrlSpecText;
+    link <- lookup parts UrlSpecLink;
+    Some (Link (txt, bless link))
+    
+(*
+fun compilePartsOfLink (parts: list mkUrlGroup) : option mkTree =
+    Some (Link ("bla", (bless "/Mk/otherPage")))
+*)    
 fun compileAsMkTreeL (e : list mkGroup) : list mkTree =
     let
 	(* group italic / bold formatting. is there a more general way of doing this? *)
@@ -156,6 +177,15 @@ fun compileAsMkTreeL (e : list mkGroup) : list mkTree =
 		case tag of
 		    BoldDel => eatBold t []
 		  | ItalicDel => eatItalic t []
+		  | UrlSpec =>
+		    (case (decomposeUrlRaw raw) of
+			 None =>
+			 compileAsMkTreeL t
+		       | Some parts =>
+			 (case (compilePartsOfLink parts) of
+			     None => compileAsMkTreeL t
+			   | Some l => l :: compileAsMkTreeL t)
+		    )	
 		  | _ => (Frag raw) :: compileAsMkTreeL t
     end
 			  
