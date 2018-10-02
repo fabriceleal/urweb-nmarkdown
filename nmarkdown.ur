@@ -55,6 +55,7 @@ fun renderMk markdown =
       | Link (text, tgLink) =>
 	<xml><a href={tgLink}>{[text]}</a></xml>
 
+
 fun testPageWithPars blah =
     return <xml>
       <body>
@@ -205,6 +206,7 @@ fun compileL (e : list mkGroup) : mkTree =
 		  | 1 => H1 (compileAsStringL t)
 		  | 2 => H2 (compileAsStringL t)
 		  | _ => H3 (compileAsStringL t))
+	      | Nregexmk.Hr => Hr 
 	      | _ => compileParag e
 		     
 					  
